@@ -34,3 +34,6 @@ add_custom_command(TARGET copy_dll POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $
 add_custom_command(TARGET copy_dll POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/lib/libp11-kit-0.dll ${PROJECT_BINARY_DIR}/libp11-kit-0.dll)
 add_custom_command(TARGET copy_dll POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/lib/libtasn1-6.dll ${PROJECT_BINARY_DIR}/libtasn1-6.dll)
 add_custom_command(TARGET copy_dll POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/lib/libzstd.dll ${PROJECT_BINARY_DIR}/libzstd.dll)
+add_custom_command(TARGET copy_dll POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/lib/libunistring-2.dll ${PROJECT_BINARY_DIR}/libunistring-2.dll)
+add_custom_command(TARGET copy_dll POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/lib/libgmp-10.dll ${PROJECT_BINARY_DIR}/libgmp-10.dll)
+add_custom_command(TARGET copy_dll POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/lib/libintl-8.dll ${PROJECT_BINARY_DIR}/libintl-8.dll)
