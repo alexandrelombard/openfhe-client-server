@@ -28,20 +28,28 @@ public:
     std::shared_ptr<httpserver::http_response> render(const httpserver::http_request&) {
         // Serialize Crypto Context
         std::cout << "GET /crypto_context" << std::endl;
-        if(!Serial::SerializeToFile("cryptocontext.txt", this->cryptoContext, SerType::BINARY)) {
-            std::cerr << "Error writing serialization of the crypto context" << std::endl;
+        try {
+            if(!Serial::SerializeToFile("cryptocontext.txt", this->cryptoContext, SerType::BINARY)) {
+                std::cerr << "Error writing serialization of the crypto context" << std::endl;
+            }
+            std::string serializedContext = Serial::SerializeToString(this->cryptoContext);
+            std::cout << serializedContext << std::endl;
+            return std::shared_ptr<httpserver::http_response>(new httpserver::string_response(serializedContext));
+        } catch (...) {
+            std::cerr << "Exception writing serialization of the crypto context" << std::endl;
+            return std::shared_ptr<httpserver::http_response>(
+                    new httpserver::string_response(
+                            "Exception writing serialization of the crypto context",
+                            httpserver::http::http_utils::http_internal_server_error));
         }
-        std::string serializedContext = Serial::SerializeToString(this->cryptoContext);
-        std::cout << serializedContext << std::endl;
-        return std::shared_ptr<httpserver::http_response>(new httpserver::string_response(serializedContext));
     }
 };
 
 int main(int argc, char* argv[]) {
     httpserver::webserver ws = httpserver::create_webserver(8080);
 
-//    hello_world_resource hwr;
-//    ws.register_resource("/hello", &hwr);
+    hello_world_resource hwr;
+    ws.register_resource("/hello", &hwr);
 
     // Sample Program: Step 1: Set CryptoContext
     CCParams<CryptoContextBFVRNS> parameters;
