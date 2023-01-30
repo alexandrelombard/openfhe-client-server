@@ -6,7 +6,7 @@
 // header files needed for serialization
 #include <ciphertext-ser.h>
 #include <cryptocontext-ser.h>
-//#include <key/key-ser.h>
+#include <key/key-ser.h>
 //#include <scheme/ckksrns/ckksrns-ser.h>
 
 using namespace lbcrypto;
@@ -35,8 +35,8 @@ public:
             std::string serializedContext = Serial::SerializeToString(this->cryptoContext);
             std::cout << serializedContext << std::endl;
             return std::shared_ptr<httpserver::http_response>(new httpserver::string_response(serializedContext));
-        } catch (...) {
-            std::cerr << "Exception writing serialization of the crypto context" << std::endl;
+        } catch (const std::exception& ex) {
+            std::cerr << "Exception writing serialization of the crypto context: " << ex.what() << std::endl;
             return std::shared_ptr<httpserver::http_response>(
                     new httpserver::string_response(
                             "Exception writing serialization of the crypto context",
