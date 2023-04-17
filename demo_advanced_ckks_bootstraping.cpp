@@ -160,12 +160,14 @@ void BootstrapExample(uint32_t numSlots) {
 
     // Step 4: Encoding and encryption of inputs
     // Generate random input
-    std::vector<double> x;
+    std::vector<double> x1;
+    std::vector<double> x2;
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(0.0, 1.0);
     for (size_t i = 0; i < numSlots; i++) {
-        x.push_back(dis(gen));
+        x1.push_back(dis(gen));
+        x2.push_back(dis(gen));
     }
 
     // Encoding as plaintexts
@@ -175,25 +177,45 @@ void BootstrapExample(uint32_t numSlots) {
     // parameters.SetBatchSize(numSlots);
     // Here, we assume all ciphertexts in the cryptoContext will have numSlots slots.
     // We start with a depleted ciphertext that has used up all of its levels.
-    Plaintext ptxt = cryptoContext->MakeCKKSPackedPlaintext(x, 1, depth - 1, nullptr, numSlots);
-    ptxt->SetLength(numSlots);
-    std::cout << "Input: " << ptxt << std::endl;
+    Plaintext ptxt1 = cryptoContext->MakeCKKSPackedPlaintext(x1, 1, depth - 1, nullptr, numSlots);
+    ptxt1->SetLength(numSlots);
+    std::cout << "Input: " << ptxt1 << std::endl;
+
+    Plaintext ptxt2 = cryptoContext->MakeCKKSPackedPlaintext(x2, 1, depth - 1, nullptr, numSlots);
+    ptxt2->SetLength(numSlots);
+    std::cout << "Input: " << ptxt2 << std::endl;
 
     // Encrypt the encoded vectors
-    Ciphertext<DCRTPoly> ciph = cryptoContext->Encrypt(keyPair.publicKey, ptxt);
+    Ciphertext<DCRTPoly> ciph1 = cryptoContext->Encrypt(keyPair.publicKey, ptxt1);
+    Ciphertext<DCRTPoly> ciph2 = cryptoContext->Encrypt(keyPair.publicKey, ptxt2);
 
-    std::cout << "Initial number of levels remaining: " << depth - ciph->GetLevel() << std::endl;
+    std::cout << "Initial number of levels remaining: " << depth - ciph1->GetLevel() << std::endl;
 
     // Step 5: Perform the bootstrapping operation. The goal is to increase the number of levels remaining
     // for HE computation.
-    auto ciphertextAfter = cryptoContext->EvalBootstrap(ciph);
+    auto ciphertextAfter1 = cryptoContext->EvalBootstrap(ciph1);
+    auto ciphertextAfter2 = cryptoContext->EvalBootstrap(ciph2);
+//    auto ciphertextAfter1 = ciph1;
+//    auto ciphertextAfter2 = ciph2;
 
-    std::cout << "Number of levels remaining after bootstrapping: " << depth - ciphertextAfter->GetLevel() << std::endl
+    std::cout << "Number of levels remaining after bootstrapping: " << depth - ciphertextAfter1->GetLevel() << std::endl
               << std::endl;
 
-    // Step 7: Decryption and output
-    Plaintext result;
-    cryptoContext->Decrypt(keyPair.secretKey, ciphertextAfter, &result);
-    result->SetLength(numSlots);
-    std::cout << "Output after bootstrapping \n\t" << result << std::endl;
+
+    for (int i = 0; i < 10; i++) {
+        auto mult = cryptoContext->EvalMult(ciphertextAfter1, ciphertextAfter2);
+
+        // Step 7: Decryption and output
+        Plaintext result;
+        cryptoContext->Decrypt(keyPair.secretKey, mult, &result);
+        result->SetLength(numSlots);
+        std::cout << "Output after bootstrapping \n\t" << result << std::endl;
+
+        ciphertextAfter1 = mult;
+
+        std::cout << "Number of levels remaining: " << depth - ciphertextAfter1->GetLevel() << std::endl
+                  << std::endl;
+
+    }
+
 }
