@@ -14,6 +14,10 @@ add_executable(openfhe_demo_simple_integers demo_simple_integers.cpp)
 set_target_properties(openfhe_demo_simple_integers PROPERTIES DEPENDS copy_dll)
 target_link_libraries(openfhe_demo_simple_integers benchmark OPENFHEcore OPENFHEpke OPENFHEbinfhe httpserver microhttpd -static-libstdc++)
 
+add_executable(openfhe_demo_advanced_ckks_bootstraping demo_advanced_ckks_bootstraping.cpp)
+set_target_properties(openfhe_demo_advanced_ckks_bootstraping PROPERTIES DEPENDS copy_dll)
+target_link_libraries(openfhe_demo_advanced_ckks_bootstraping benchmark OPENFHEcore OPENFHEpke OPENFHEbinfhe httpserver microhttpd -static-libstdc++)
+
 add_executable(openfhe_webserver web_server.cpp)
 set_target_properties(openfhe_webserver PROPERTIES DEPENDS copy_dll)
 target_link_libraries(openfhe_webserver benchmark OPENFHEcore OPENFHEpke OPENFHEbinfhe httpserver microhttpd -static-libstdc++)
