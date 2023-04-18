@@ -15,6 +15,7 @@ namespace fhe_parser {
     class ExpressionTree {
     public:
         ExpressionTree(const ExpressionTree& e) = default;
+        ExpressionTree& operator=(const ExpressionTree& e) = default;
 
         static ExpressionTree build(const std::string& expression);
     private:

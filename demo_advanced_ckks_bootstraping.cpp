@@ -201,7 +201,6 @@ void BootstrapExample(uint32_t numSlots) {
     std::cout << "Number of levels remaining after bootstrapping: " << depth - ciphertextAfter1->GetLevel() << std::endl
               << std::endl;
 
-
     for (int i = 0; i < 10; i++) {
         auto mult = cryptoContext->EvalMult(ciphertextAfter1, ciphertextAfter2);
 
