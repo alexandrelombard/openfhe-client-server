@@ -15,18 +15,23 @@ namespace fhe_parser {
         auto tokens = std::make_shared<std::vector<std::string>>();
 
         std::string preprocessed_expression = expression;
-        preprocessed_expression.erase(std::remove_if(preprocessed_expression.begin(), preprocessed_expression.end(), ::isspace));
+//        preprocessed_expression.erase(std::remove_if(preprocessed_expression.begin(), preprocessed_expression.end(), ::isspace));
+        std::string::iterator end_pos = std::remove(preprocessed_expression.begin(), preprocessed_expression.end(), ' ');
+        preprocessed_expression.erase(end_pos, preprocessed_expression.end());
 
         while (preprocessed_expression[idx] != '\0') {
             const char c = preprocessed_expression[idx];
             if(c == '+' || c == '-' || c == '*' || c == '/') {
                 // FIXME Manage unary minus
-                tokens->push_back(expression.substr(oldIdx, idx));
+                tokens->push_back(preprocessed_expression.substr(oldIdx, idx - oldIdx));  // Push the part before the operator
+                tokens->push_back(preprocessed_expression.substr(idx, 1));                // Push the operator
                 oldIdx = idx + 1;
             }
 
             idx += 1;
         }
+
+        tokens->push_back(preprocessed_expression.substr(oldIdx, idx - oldIdx));    // Push the remaining part
 
         return tokens;
     }
@@ -38,6 +43,6 @@ namespace fhe_parser {
         // Generate the tree from the expression
         auto expression_tree = ExpressionTree();
 
-        return std::make_shared<ExpressionTree>(expression_tree)
+        return std::make_shared<ExpressionTree>(expression_tree);
     }
 }

@@ -23,7 +23,7 @@ set_target_properties(openfhe_webserver PROPERTIES DEPENDS copy_dll)
 target_link_libraries(openfhe_webserver benchmark OPENFHEcore OPENFHEpke OPENFHEbinfhe httpserver microhttpd -static-libstdc++)
 
 #region Tests
-add_executable(test_parser parser/ExpressionTree.h parser/ExpressionTree.cpp parser/ExpressionParser.h parser/ExpressionParser.cpp parser/ExpressionTreeNode.h parser/ExpressionTreeNode.cpp)
+add_executable(test_parser test/TestExpressionParser.cpp parser/ExpressionTree.h parser/ExpressionTree.cpp parser/ExpressionParser.h parser/ExpressionParser.cpp parser/ExpressionTreeNode.h parser/ExpressionTreeNode.cpp)
 set_target_properties(test_parser PROPERTIES DEPENDS copy_dll)
 target_link_libraries(test_parser benchmark OPENFHEcore OPENFHEpke OPENFHEbinfhe httpserver microhttpd -static-libstdc++)
 #endregion
