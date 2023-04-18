@@ -10,15 +10,15 @@ add_definitions(-DMATHBACKEND=4)
 
 add_custom_target(copy_dll)
 
-add_executable(openfhe_demo_simple_integers demo_simple_integers.cpp)
+add_executable(openfhe_demo_simple_integers demo_simple_integers.cpp parser/ExpressionParser.cpp parser/ExpressionParser.h parser/ExpressionTreeNode.cpp parser/ExpressionTreeNode.h parser/ExpressionTree.cpp parser/ExpressionTree.h)
 set_target_properties(openfhe_demo_simple_integers PROPERTIES DEPENDS copy_dll)
 target_link_libraries(openfhe_demo_simple_integers benchmark OPENFHEcore OPENFHEpke OPENFHEbinfhe httpserver microhttpd -static-libstdc++)
 
-add_executable(openfhe_demo_advanced_ckks_bootstraping demo_advanced_ckks_bootstraping.cpp)
+add_executable(openfhe_demo_advanced_ckks_bootstraping demo_advanced_ckks_bootstraping.cpp parser/ExpressionParser.cpp parser/ExpressionParser.h parser/ExpressionTreeNode.cpp parser/ExpressionTreeNode.h parser/ExpressionTree.cpp parser/ExpressionTree.h)
 set_target_properties(openfhe_demo_advanced_ckks_bootstraping PROPERTIES DEPENDS copy_dll)
 target_link_libraries(openfhe_demo_advanced_ckks_bootstraping benchmark OPENFHEcore OPENFHEpke OPENFHEbinfhe httpserver microhttpd -static-libstdc++)
 
-add_executable(openfhe_webserver web_server.cpp)
+add_executable(openfhe_webserver web_server.cpp parser/ExpressionParser.cpp parser/ExpressionParser.h parser/ExpressionTreeNode.cpp parser/ExpressionTreeNode.h parser/ExpressionTree.cpp parser/ExpressionTree.h)
 set_target_properties(openfhe_webserver PROPERTIES DEPENDS copy_dll)
 target_link_libraries(openfhe_webserver benchmark OPENFHEcore OPENFHEpke OPENFHEbinfhe httpserver microhttpd -static-libstdc++)
 

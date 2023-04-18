@@ -193,7 +193,7 @@ void BootstrapExample(uint32_t numSlots) {
 
     // Step 5: Perform the bootstrapping operation. The goal is to increase the number of levels remaining
     // for HE computation.
-    auto ciphertextAfter1 = cryptoContext->EvalBootstrap(ciph1);
+    Ciphertext<DCRTPoly> ciphertextAfter1 = cryptoContext->EvalBootstrap(ciph1);
     auto ciphertextAfter2 = cryptoContext->EvalBootstrap(ciph2);
 //    auto ciphertextAfter1 = ciph1;
 //    auto ciphertextAfter2 = ciph2;
