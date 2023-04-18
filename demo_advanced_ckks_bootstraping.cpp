@@ -213,6 +213,8 @@ void BootstrapExample(uint32_t numSlots) {
 
         ciphertextAfter1 = mult;
 
+        // ciphertextAfter1 = cryptoContext->EvalBootstrap(ciphertextAfter1);   // Enable to renew the bootstraping and reset the levels remaining
+
         std::cout << "Number of levels remaining: " << depth - ciphertextAfter1->GetLevel() << std::endl
                   << std::endl;
 
