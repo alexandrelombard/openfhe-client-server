@@ -19,7 +19,10 @@ namespace fhe_ext {
                 const lbcrypto::CryptoContext<lbcrypto::DCRTPoly>& cryptoContext,
                 const lbcrypto::Ciphertext<lbcrypto::DCRTPoly>& encryptedX,
                 uint16_t iterationsCount,
-                uint16_t scaleCount = 1);
+                usint depth,
+                const lbcrypto::PublicKey<lbcrypto::DCRTPoly>& publicKey,
+                uint32_t numIterations,
+                uint32_t precision);
 
 
         /**

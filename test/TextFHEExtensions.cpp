@@ -221,13 +221,12 @@ int main(int argc, char *argv[]) {
     std::cout << "Sqrt operation has started .........................." << std::endl << std::endl;
     auto startSqrt = std::chrono::high_resolution_clock::now();
 
-    auto sqrtResult = FHEExtensions::fheSqrt(cryptoContext, cipherABootst, 12, 0);
+    auto sqrtResult = FHEExtensions::fheSqrt(cryptoContext, cipherABootst, 12, depth, keyPair.publicKey, numIterations, precision);
 
     auto endSqrt = std::chrono::high_resolution_clock::now();
     auto durationSqrt = std::chrono::duration_cast<std::chrono::milliseconds>(endSqrt - startSqrt);
 
     std::cout << "Time taken Sqrt() operation == " << durationSqrt.count() << " milliseconds." << std::endl;
-
     {
         Plaintext FinalResult;
         cryptoContext->Decrypt(keyPair.secretKey, sqrtResult, &FinalResult);
@@ -244,7 +243,7 @@ int main(int argc, char *argv[]) {
     std::cout << "Inverse operation has started .........................." << std::endl << std::endl;
     auto startInverse = std::chrono::high_resolution_clock::now();
 
-    auto inverseResult = FHEExtensions::fheInverse(cryptoContext, cipherABootst, 12, depth, keyPair.publicKey,2, 17);
+    auto inverseResult = FHEExtensions::fheInverse(cryptoContext, cipherABootst, 1, depth, keyPair.publicKey,2, 17);
 
     auto endInverse = std::chrono::high_resolution_clock::now();
     auto durationInverse = std::chrono::duration_cast<std::chrono::milliseconds>(endInverse - startInverse);
