@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
 
     // Step 4: Encoding and encryption of inputs
     // Inputs
-    std::vector<double> A = {5, 6};
+    std::vector<double> A = {0.7, 2};
     std::vector<double> B = {10, 13};
 
 
@@ -221,7 +221,7 @@ int main(int argc, char *argv[]) {
     std::cout << "Sqrt operation has started .........................." << std::endl << std::endl;
     auto startSqrt = std::chrono::high_resolution_clock::now();
 
-    auto sqrtResult = FHEExtensions::fheSqrt(cryptoContext, cipherABootst, 12);
+    auto sqrtResult = FHEExtensions::fheSqrt(cryptoContext, cipherABootst, 12, 0);
 
     auto endSqrt = std::chrono::high_resolution_clock::now();
     auto durationSqrt = std::chrono::duration_cast<std::chrono::milliseconds>(endSqrt - startSqrt);
@@ -244,8 +244,7 @@ int main(int argc, char *argv[]) {
     std::cout << "Inverse operation has started .........................." << std::endl << std::endl;
     auto startInverse = std::chrono::high_resolution_clock::now();
 
-    auto inverseResult = FHEExtensions::fheInverse(cryptoContext, cipherABootst, 12, depth, keyPair.publicKey, A.size(),
-                                                   2, 17);
+    auto inverseResult = FHEExtensions::fheInverse(cryptoContext, cipherABootst, 12, depth, keyPair.publicKey,2, 17);
 
     auto endInverse = std::chrono::high_resolution_clock::now();
     auto durationInverse = std::chrono::duration_cast<std::chrono::milliseconds>(endInverse - startInverse);
