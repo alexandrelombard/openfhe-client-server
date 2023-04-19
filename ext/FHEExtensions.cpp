@@ -32,10 +32,13 @@ namespace fhe_ext {
             uint32_t numSlots,
             uint32_t numIterations,
             uint32_t precision) {
-        std::vector<double> ePsi = {0.1};
+        std::vector<double> ePsi;
+        for (int i = 0; i < encryptedX->GetSlots(); ++i) {
+            ePsi.push_back(0.1);
+        }
         size_t encodedLength = ePsi.size();
 
-        Plaintext epsilon = cryptoContext->MakeCKKSPackedPlaintext(ePsi, 1, depth - 1, nullptr, numSlots);
+        Plaintext epsilon = cryptoContext->MakeCKKSPackedPlaintext(ePsi);
         epsilon->SetLength(encodedLength);
 
         auto ce = cryptoContext->Encrypt(publicKey, epsilon);

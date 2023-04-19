@@ -165,14 +165,14 @@ int main(int argc, char *argv[]) {
 
     auto end_encrypt2 = std::chrono::high_resolution_clock::now();
     auto resutlat_encrypt2 = std::chrono::duration_cast<std::chrono::milliseconds>(end_encrypt2 - start_encrypt2);
-    std::cout << "Time taken for the encryption of the seconde Plainttext ptxt2  == " << resutlat_encrypt2.count()
+    std::cout << "Time taken for the encryption of the second plainttext ptxt2  == " << resutlat_encrypt2.count()
               << " milliseconds." << std::endl;
 
 
-    std::cout << "Initial number of levels remaining (Before the Bootstrapping) :" << depth - cipherA->GetLevel()
+    std::cout << "Initial number of levels remaining (before the bootstrapping) :" << depth - cipherA->GetLevel()
               << "and multi dpeth " << parameters.GetMultiplicativeDepth() << std::endl;
 
-    std::cout << " Perform the bootstrapping operation has Strated ..................... " << std::endl << std::endl;
+    std::cout << " Perform the bootstrapping operation has started ..................... " << std::endl << std::endl;
     auto startPerfBootstrap = std::chrono::high_resolution_clock::now();
 
     // Set precision equal to empirically measured value after many test runs.
@@ -207,7 +207,7 @@ int main(int argc, char *argv[]) {
     std::cout << "Sqrt operation has started .........................." << std::endl << std::endl;
     auto startSqrt = std::chrono::high_resolution_clock::now();
 
-    auto sqrtResult = FHEExtensions::fheSqrt(cryptoContext, cipherABootst, 10);
+    auto sqrtResult = FHEExtensions::fheSqrt(cryptoContext, cipherABootst, 12);
 
     auto endSqrt = std::chrono::high_resolution_clock::now();
     auto durationSqrt = std::chrono::duration_cast<std::chrono::milliseconds>(endSqrt - startSqrt);
