@@ -36,7 +36,7 @@ namespace fhe_parser {
         return tokens;
     }
 
-    const std::shared_ptr<ExpressionTree> ExpressionTree::build(const std::string &expression) {
+    std::shared_ptr<ExpressionTree> ExpressionTree::build(const std::string &expression) {
         // Convert the expression to a vector of tokens
         auto tokens = tokenize(expression);
 
