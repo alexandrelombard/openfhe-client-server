@@ -38,7 +38,7 @@ namespace fhe_ext {
         }
         size_t encodedLength = ePsi.size();
 
-        Plaintext epsilon = cryptoContext->MakeCKKSPackedPlaintext(ePsi);
+        Plaintext epsilon = cryptoContext->MakeCKKSPackedPlaintext(ePsi, 1, depth - 1, nullptr, encodedLength);
         epsilon->SetLength(encodedLength);
 
         auto ce = cryptoContext->Encrypt(publicKey, epsilon);
