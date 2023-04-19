@@ -236,10 +236,10 @@ int main(int argc, char *argv[]) {
     std::cout << "Time taken Inverse() operation == " << durationInverse.count() << " milliseconds." << std::endl;
 
     {
-        Plaintext FinalResult;
-        cryptoContext->Decrypt(keyPair.secretKey, inverseResult, &FinalResult);
-        FinalResult->SetLength(numSlots);
-        std::cout << "The Inverse() of A: \n\t" << FinalResult << std::endl;
+        Plaintext finalResult;
+        cryptoContext->Decrypt(keyPair.secretKey, inverseResult, &finalResult);
+        finalResult->SetLength(numSlots);
+        std::cout << "The Inverse() of A: \n\t" << finalResult << std::endl;
     }
     //endregion
 
@@ -256,10 +256,10 @@ int main(int argc, char *argv[]) {
     std::cout << "Time taken Max operation == " << durationSqrt.count() << " milliseconds." << std::endl;
 
     {
-        Plaintext FinalResult;
-        cryptoContext->Decrypt(keyPair.secretKey, resultMax, &FinalResult);
-        FinalResult->SetLength(numSlots);
-        std::cout << "The Max of A and B:\n\t" << FinalResult << std::endl;
+        Plaintext finalResult;
+        cryptoContext->Decrypt(keyPair.secretKey, resultMax, &finalResult);
+        finalResult->SetLength(numSlots);
+        std::cout << "The Max of A and B:\n\t" << finalResult << std::endl;
     }
     //endregion
 

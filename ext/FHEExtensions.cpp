@@ -9,14 +9,14 @@ namespace fhe_ext {
             const CryptoContext<DCRTPoly>& cryptoContext,
             const Ciphertext<DCRTPoly>& encryptedX,
             uint16_t  iterationsCount) {
-        auto encryptedResult = encryptedX;                            // il ne faut pas bootstraper une valeur vide sinon errors segmentation faut 11
+        auto encryptedResult = encryptedX;                                   // il ne faut pas bootstraper une valeur vide sinon errors segmentation faut 11
         auto b = cryptoContext->EvalSub(encryptedX, 1);     // b = x - 1;
 
         for (int n = 0; n < iterationsCount; n++) {
             auto cBootst = cryptoContext->EvalMult(b, 0.5); //c = (b / 2);
             encryptedResult = cryptoContext->EvalMult(encryptedResult, cryptoContext->EvalSub(1, cBootst)); // a = a * (1 - c);
             auto fBootst = cryptoContext->EvalMult(cryptoContext->EvalSub(b, 3), 0.25);  //f = (b - 3) / 4;
-            auto eBootst=  cryptoContext->EvalMult(b, b);  //e = pow(b, 2);
+            auto eBootst=  cryptoContext->EvalSquare(b);  //e = pow(b, 2);
             b = cryptoContext->EvalMult(eBootst, fBootst); //  b = e * f;
         }
 
