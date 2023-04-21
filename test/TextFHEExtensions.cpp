@@ -11,9 +11,9 @@ using namespace lbcrypto;
 using namespace fhe_ext;
 
 int main(int argc, char *argv[]) {
-    const int numSlots = 2;
+    const int numSlots = 4;
 
-//    std::cout << "Set CryptoContext has started ................. " << std::endl << std::endl;
+//    std::cout << "Set CryptoContext has started ................. " << std::endl;
     auto start_GenContext = std::chrono::high_resolution_clock::now();
 
     // Step 1: Set CryptoContext
@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
     uint32_t levelsUsedBeforeBootstrap = 50;
     usint depth =
             levelsUsedBeforeBootstrap + FHECKKSRNS::GetBootstrapDepth(approxBootstrapDepth, levelBudget, secretKeyDist);
-//    std::cout << "MultiplicativeDepth: " << depth << std::endl << std::endl;
+//    std::cout << "MultiplicativeDepth: " << depth << std::endl;
     parameters.SetMultiplicativeDepth(depth);
 
     // Generate crypto context.
@@ -96,10 +96,10 @@ int main(int argc, char *argv[]) {
     cryptoContext->Enable(FHE);
 
     usint ringDim = cryptoContext->GetRingDimension();
-//    std::cout << "CKKS scheme is using ring dimension " << ringDim << std::endl << std::endl;
+//    std::cout << "CKKS scheme is using ring dimension " << ringDim << std::endl;
 
 
-//    std::cout << "Precomputations for bootstrapping has started ..................... " << std::endl << std::endl;
+//    std::cout << "Precomputations for bootstrapping has started ..................... " << std::endl;
     auto start_Bootst = std::chrono::high_resolution_clock::now();
     // Step 2: Precomputations for bootstrapping
     cryptoContext->EvalBootstrapSetup(levelBudget, bsgsDim, numSlots);
@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
 //              << std::endl;
 
 
-//    std::cout << " Key Generation has started ..................... " << std::endl << std::endl;
+//    std::cout << " Key Generation has started ..................... " << std::endl;
     auto startKeyGen = std::chrono::high_resolution_clock::now();
 
     // Step 3: Key Generation
@@ -125,13 +125,13 @@ int main(int argc, char *argv[]) {
 //    std::cout << "Time taken for Key Generation  == " << durationKeyGen.count() << " milliseconds." << std::endl;
 //
 //
-//    std::cout << " Set up and encoding the Plaintext has started  ..................... " << std::endl << std::endl;
+//    std::cout << " Set up and encoding the Plaintext has started  ..................... " << std::endl;
     auto start_encoder = std::chrono::high_resolution_clock::now();
 
     // Step 4: Encoding and encryption of inputs
     // Inputs
-    std::vector<double> A = {0.7, 2};
-    std::vector<double> B = {10, 13};
+    std::vector<double> A = {0.7, 2, -3.0, -1.2};
+    std::vector<double> B = {10, 13, -15.0, -5.5};
 
 
     // Encoding as plaintexts
@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
 //    std::cout << "Time taken for Setup and Encoding  == " << resultEncoder.count() << " milliseconds." << std::endl;
 
 
-//    std::cout << " Encrpytion the Plaintext has started  ..................... " << std::endl << std::endl;
+//    std::cout << " Encrpytion the Plaintext has started  ..................... " << std::endl;
     auto startEncrypt = std::chrono::high_resolution_clock::now();
     // Encrypt the encoded vectors
     auto cipherA = cryptoContext->Encrypt(keyPair.publicKey, ptxt1);
@@ -172,7 +172,7 @@ int main(int argc, char *argv[]) {
 //    std::cout << "Initial number of levels remaining (before the bootstrapping) :" << depth - cipherA->GetLevel()
 //              << "and multi depth " << parameters.GetMultiplicativeDepth() << std::endl;
 //
-//    std::cout << " Perform the bootstrapping operation has started ..................... " << std::endl << std::endl;
+//    std::cout << " Perform the bootstrapping operation has started ..................... " << std::endl;
     auto startPerfBootstrap = std::chrono::high_resolution_clock::now();
 
     // Set precision equal to empirically measured value after many test runs.
@@ -217,11 +217,33 @@ int main(int argc, char *argv[]) {
               << std::endl;
     //endregion
 
+    //region Inverse Sqrt
+    std::cout << "Inverse Sqrt operation has started..." << std::endl;
+    auto startInvSqrt = std::chrono::high_resolution_clock::now();
+
+    auto invSqrtResult = FHEExtensions::inverseSqrt(cryptoContext, cipherABootst, 12);
+
+    auto endInvSqrt = std::chrono::high_resolution_clock::now();
+    auto durationInvSqrt = std::chrono::duration_cast<std::chrono::milliseconds>(endInvSqrt - startInvSqrt);
+
+    std::cout << "Time taken InverseSqrt() operation == " << durationInvSqrt.count() << " milliseconds." << std::endl;
+    {
+        Plaintext FinalResult;
+        cryptoContext->Decrypt(keyPair.secretKey, invSqrtResult, &FinalResult);
+        FinalResult->SetLength(numSlots);
+        std::cout << "The InverseSqrt() of A: \n\t" << FinalResult << std::endl;
+    }
+
+    std::cout << "Number of levels remaining after sqrt(): " << depth - cipherABootst->GetLevel()
+              << " and multi depth " << parameters.GetMultiplicativeDepth() << std::endl
+              << std::endl;
+    //endregion
+
     //region Sqrt
-    std::cout << "Sqrt operation has started .........................." << std::endl << std::endl;
+    std::cout << "Sqrt operation has started..." << std::endl;
     auto startSqrt = std::chrono::high_resolution_clock::now();
 
-    auto sqrtResult = FHEExtensions::fheSqrt(cryptoContext, cipherABootst, 12);
+    auto sqrtResult = FHEExtensions::sqrt(cryptoContext, cipherABootst, 4);
 
     auto endSqrt = std::chrono::high_resolution_clock::now();
     auto durationSqrt = std::chrono::duration_cast<std::chrono::milliseconds>(endSqrt - startSqrt);
@@ -240,11 +262,11 @@ int main(int argc, char *argv[]) {
     //endregion
 
     //region Inverse
-    std::cout << "Inverse operation has started .........................." << std::endl << std::endl;
+    std::cout << "Inverse operation has started .........................." << std::endl;
     auto startInverse = std::chrono::high_resolution_clock::now();
 
     auto ceAfterBootst = FHEExtensions::getEpsilon(cryptoContext, keyPair.publicKey, A.size(), depth, numIterations, precision);
-    auto inverseResult = FHEExtensions::fheInverse(cryptoContext, cipherABootst, ceAfterBootst, 12);
+    auto inverseResult = FHEExtensions::inverse(cryptoContext, cipherABootst, ceAfterBootst, 12);
 
     auto endInverse = std::chrono::high_resolution_clock::now();
     auto durationInverse = std::chrono::duration_cast<std::chrono::milliseconds>(endInverse - startInverse);
@@ -263,12 +285,34 @@ int main(int argc, char *argv[]) {
               << std::endl;
     //endregion
 
+    //region Abs value
+    std::cout << "Abs value operation has started .........................." << std::endl;
+    auto startAbs = std::chrono::high_resolution_clock::now();
+    auto absResult = FHEExtensions::abs(cryptoContext, cipherABootst, 12);
+
+    auto endAbs = std::chrono::high_resolution_clock::now();
+    auto durationAbs  = std::chrono::duration_cast<std::chrono::milliseconds>(endAbs - startAbs);
+
+    std::cout << "Time taken Abs() operation == " << durationAbs.count() << " milliseconds." << std::endl;
+
+    {
+        Plaintext finalResult;
+        cryptoContext->Decrypt(keyPair.secretKey, absResult, &finalResult);
+        finalResult->SetLength(numSlots);
+        std::cout << "The Inverse() of A: \n\t" << finalResult << std::endl;
+    }
+
+    std::cout << "Number of levels remaining after abs(): " << depth - cipherABootst->GetLevel()
+              << " and multi depth " << parameters.GetMultiplicativeDepth() << std::endl
+              << std::endl;
+    //endregion
+
 
     //region Max
-    std::cout << " Max operation has started .........................." << std::endl << std::endl;
+    std::cout << " Max operation has started .........................." << std::endl;
     auto startMax = std::chrono::high_resolution_clock::now();
 
-    auto resultMax = FHEExtensions::fheMax(cryptoContext, cipherABootst, cipherBBootst, ceAfterBootst);
+    auto resultMax = FHEExtensions::max(cryptoContext, cipherABootst, cipherBBootst, ceAfterBootst);
 
     auto endMax = std::chrono::high_resolution_clock::now();
     auto durationMax = std::chrono::duration_cast<std::chrono::milliseconds>(endMax - startMax);

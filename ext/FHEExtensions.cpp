@@ -26,25 +26,102 @@ namespace fhe_ext {
         return ceAfterBootstrap;
     }
 
-    Ciphertext<DCRTPoly> FHEExtensions::fheSqrt(
-            const CryptoContext<DCRTPoly>& cryptoContext,
-            const Ciphertext<DCRTPoly>& encryptedX,
+    Ciphertext<DCRTPoly> FHEExtensions::sqrt(
+            const lbcrypto::CryptoContext<lbcrypto::DCRTPoly> &cryptoContext,
+            const lbcrypto::Ciphertext<lbcrypto::DCRTPoly> &encryptedX,
             uint16_t  iterationsCount) {
-        auto a = encryptedX;
-        auto c = cryptoContext->EvalSub(encryptedX, 1);
+//        auto a = encryptedX;
+//        auto c = cryptoContext->EvalSub(encryptedX, 1);
+//
+//        for (int n = 0; n < iterationsCount; n++) {
+//            a = cryptoContext->EvalSub(a, cryptoContext->EvalMult(cryptoContext->EvalMult(a, c), 0.25));    // a[n+1] = a[n] - a[n] * c[n] / 2
+//            c = cryptoContext->EvalMult(cryptoContext->EvalMult(cryptoContext->EvalSquare(c), cryptoContext->EvalSub(c, 3)), 0.25); // c[n+1] = c[n]^2 * (c[n] - 3) / 4
+//        }
+//
+//        return a;
 
-        for (int n = 0; n < iterationsCount; n++) {
-            a = cryptoContext->EvalSub(a, cryptoContext->EvalMult(cryptoContext->EvalMult(a, c), 0.25));    // a[n+1] = a[n] - a[n] * c[n] / 2
-            c = cryptoContext->EvalMult(cryptoContext->EvalMult(cryptoContext->EvalSquare(c), cryptoContext->EvalSub(c, 3)), 0.25); // c[n+1] = c[n]^2 * (c[n] - 3) / 4
+        // Goldschmidt's algorithm #1 for square root
+        const auto& s = encryptedX;
+        auto b = s;
+        auto Y = cryptoContext->EvalMult(s, 0.33);
+        auto x = cryptoContext->EvalMult(s, Y);
+        auto y = Y;
+
+        for (auto i = 0; i < iterationsCount; ++i) {
+            b = cryptoContext->EvalMult(b, cryptoContext->EvalSquare(Y));
+            Y = cryptoContext->EvalMult(0.5, cryptoContext->EvalSub(3, b));
+            x = cryptoContext->EvalMult(x, Y);
+            y = cryptoContext->EvalMult(y, Y);
         }
 
-        return a;
+        return x;
     }
 
-    lbcrypto::Ciphertext<lbcrypto::DCRTPoly> FHEExtensions::fheInverse(
+    Ciphertext<lbcrypto::DCRTPoly> FHEExtensions::inverseSqrt(
             const CryptoContext <DCRTPoly> &cryptoContext,
             const Ciphertext <DCRTPoly> &encryptedX,
-            const Ciphertext <DCRTPoly> &ceAfterBootst,
+            uint16_t iterationsCount) {
+//        const auto& m = encryptedX;
+//        auto x = cryptoContext->EvalMult(m, 2);
+//
+//        for(auto i = 0; i < iterationsCount; ++i) {
+//            auto x2 = cryptoContext->EvalSquare(x);
+//            x = cryptoContext->EvalMult(cryptoContext->EvalMult(0.5, x), cryptoContext->EvalSub(3, cryptoContext->EvalMult(m, x2)));
+//        }
+//
+//        return x;
+
+        // Goldschmidt's algorithm #1 for inverse square root
+//        const auto& s = encryptedX;
+//        auto b = s;
+//        auto Y = cryptoContext->EvalMult(s, 0.33);
+//        auto x = cryptoContext->EvalMult(s, Y);
+//        auto y = Y;
+//
+//        for (auto i = 0; i < iterationsCount; ++i) {
+//            b = cryptoContext->EvalMult(b, cryptoContext->EvalSquare(Y));
+//            Y = cryptoContext->EvalMult(0.5, cryptoContext->EvalSub(3, b));
+//            x = cryptoContext->EvalMult(x, Y);
+//            y = cryptoContext->EvalMult(y, Y);
+//        }
+//
+//        return y;
+
+        // Goldschmidt's algorithm #2 for inverse square root
+        const auto& s = encryptedX;
+        const auto& estimatedInverseSqrt = cryptoContext->EvalMult(s, 0.33);
+        auto x = cryptoContext->EvalMult(s, estimatedInverseSqrt);
+        auto h = cryptoContext->EvalMult(0.5, estimatedInverseSqrt);
+        auto r = cryptoContext->EvalMult(0.5, cryptoContext->EvalSub(1, cryptoContext->EvalMult(2, cryptoContext->EvalMult(x, h))));
+
+        for (auto i = 0; i < iterationsCount; ++i) {
+            x = cryptoContext->EvalMult(x, cryptoContext->EvalAdd(1, r));
+            h = cryptoContext->EvalMult(h, cryptoContext->EvalAdd(1, r));
+            r = cryptoContext->EvalMult(0.5, cryptoContext->EvalSub(1, cryptoContext->EvalMult(2, cryptoContext->EvalMult(x, h))));
+
+            std::cout << x->GetLevel() << " " << h->GetLevel() << " " << r->GetLevel() << std::endl;
+
+//            if (i % 3 == 1) {
+                x = cryptoContext->EvalBootstrap(x, 2, 17);
+                h = cryptoContext->EvalBootstrap(h, 2, 17);
+                r = cryptoContext->EvalBootstrap(r, 2, 17);
+//            }
+        }
+
+        return cryptoContext->EvalMult(2, h);
+    }
+
+    Ciphertext<DCRTPoly> FHEExtensions::abs(
+            const CryptoContext <DCRTPoly> &cryptoContext,
+            const Ciphertext <DCRTPoly> &encryptedX,
+            uint16_t iterationsCount) {
+        return sqrt(cryptoContext, cryptoContext->EvalSquare(encryptedX), iterationsCount);
+    }
+
+    Ciphertext<DCRTPoly> FHEExtensions::inverse(
+            const CryptoContext<DCRTPoly> &cryptoContext,
+            const Ciphertext<DCRTPoly> &encryptedX,
+            const Ciphertext<DCRTPoly> &ceAfterBootst,
             uint16_t iterationsCount) {
         auto cb = ceAfterBootst;
 
@@ -57,7 +134,7 @@ namespace fhe_ext {
         return cb;
     }
 
-//    Ciphertext<DCRTPoly> FHEExtensions::fheInverse(
+//    Ciphertext<DCRTPoly> FHEExtensions::inverse(
 //            const CryptoContext<DCRTPoly>& cryptoContext,
 //            const Ciphertext<DCRTPoly>& encryptedX,
 //            int iterationsCount,
@@ -88,10 +165,10 @@ namespace fhe_ext {
 //        return cb;
 //    }
 
-    Ciphertext<DCRTPoly> FHEExtensions::fheMaxPrime(
-            const CryptoContext<DCRTPoly>& cryptoContext,
-            const Ciphertext<DCRTPoly>& a,
-            const Ciphertext<DCRTPoly>& b) {
+    Ciphertext<DCRTPoly> FHEExtensions::maxPrime(
+            const lbcrypto::CryptoContext<lbcrypto::DCRTPoly> &cryptoContext,
+            const lbcrypto::Ciphertext<lbcrypto::DCRTPoly> &a,
+            const lbcrypto::Ciphertext<lbcrypto::DCRTPoly> &b) {
         auto addAB = cryptoContext->EvalAdd(a, b);  //x = (a + b) ;
         auto multSub = cryptoContext->EvalMult(addAB , 0.5); //x = (a + b) / 2;
         auto subAB = cryptoContext->EvalSub(a , b); //y = (a - b)
@@ -99,29 +176,34 @@ namespace fhe_ext {
 
         auto powA_B_ = cryptoContext->EvalSquare(multSub2); // y = pow(y, 2)
 
-        auto encryptedSqrt = fheSqrt(cryptoContext, powA_B_, 5);   //z = sqrt(pow(y, 2));
+        auto encryptedSqrt = sqrt(cryptoContext, powA_B_, 5);   //z = sqrt(pow(y, 2));
 
         auto maxValue = cryptoContext->EvalAdd (multSub, encryptedSqrt);
 
         return maxValue;
     }
 
-    Ciphertext<DCRTPoly> FHEExtensions::fheMax(
-            const CryptoContext<DCRTPoly>& cryptoContext,
-            const Ciphertext<DCRTPoly>& a,
-            const Ciphertext<DCRTPoly>& b,
-            const Ciphertext<DCRTPoly>& ceAfterBootstrap,
+    Ciphertext<DCRTPoly> FHEExtensions::max(
+            const lbcrypto::CryptoContext<lbcrypto::DCRTPoly> &cryptoContext,
+            const lbcrypto::Ciphertext<lbcrypto::DCRTPoly> &a,
+            const lbcrypto::Ciphertext<lbcrypto::DCRTPoly> &b,
+            const lbcrypto::Ciphertext<lbcrypto::DCRTPoly> &ceAfterBootstrap,
             int iterationsCount) {
 
-        auto addAB = cryptoContext->EvalAdd(a , b);  //x = (a + b) ;
-        auto invAddAB = fheInverse(cryptoContext, addAB, ceAfterBootstrap, iterationsCount);
+//        auto addAB = cryptoContext->EvalAdd(a , b);  //x = (a + b) ;
+//        auto invAddAB = inverse(cryptoContext, addAB, ceAfterBootstrap, iterationsCount);
+//
+//        auto a_ = cryptoContext->EvalMult(a, invAddAB);
+//        auto b_ = cryptoContext->EvalMult(b, invAddAB);
+//
+//        auto a_b_ = maxPrime(cryptoContext, a_, b_);
+//
+//        auto maxValue = cryptoContext->EvalAdd (addAB, a_b_);
+//
+//        return maxValue;
 
-        auto a_ = cryptoContext->EvalMult(a, invAddAB);
-        auto b_ = cryptoContext->EvalMult(b, invAddAB);
-
-        auto a_b_ = fheMaxPrime(cryptoContext, a_, b_);
-
-        auto maxValue = cryptoContext->EvalAdd (addAB, a_b_);
+        auto maxValue = cryptoContext->EvalMult(
+                cryptoContext->EvalAdd(cryptoContext->EvalAdd(a, b), abs(cryptoContext, cryptoContext->EvalSub(a, b), iterationsCount)), 0.5);
 
         return maxValue;
     }

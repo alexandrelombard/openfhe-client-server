@@ -23,9 +23,33 @@ namespace fhe_ext {
          * @param iterationsCount the number of iterations (the higher, the better the accuracy)
          * @return the encrypted result of sqrt(encryptedX)
          */
-        static lbcrypto::Ciphertext<lbcrypto::DCRTPoly> fheSqrt(
-                const lbcrypto::CryptoContext<lbcrypto::DCRTPoly>& cryptoContext,
-                const lbcrypto::Ciphertext<lbcrypto::DCRTPoly>& encryptedX,
+        static lbcrypto::Ciphertext<lbcrypto::DCRTPoly> sqrt(
+                const lbcrypto::CryptoContext<lbcrypto::DCRTPoly> &cryptoContext,
+                const lbcrypto::Ciphertext<lbcrypto::DCRTPoly> &encryptedX,
+                uint16_t iterationsCount);
+
+        /**
+         * Performs an approximation of inverseSqrt() in an homomorphic context
+         * @param cryptoContext the crypto context
+         * @param encryptedX the value for which inverseSqrt() will be computed
+         * @param iterationsCount the number of iterations (the higher, the better the accuracy)
+         * @return the encrypted result of inverseSqrt(encryptedX)
+         */
+        static lbcrypto::Ciphertext<lbcrypto::DCRTPoly> inverseSqrt(
+                const lbcrypto::CryptoContext<lbcrypto::DCRTPoly> &cryptoContext,
+                const lbcrypto::Ciphertext<lbcrypto::DCRTPoly> &encryptedX,
+                uint16_t iterationsCount);
+
+        /**
+        * Performs an approximation of abs() in an homomorphic context
+        * @param cryptoContext the crypto context
+        * @param encryptedX the value for which abs() will be computed
+        * @param iterationsCount the number of iterations (the higher, the better the accuracy)
+        * @return the encrypted result of abs(encryptedX)
+        */
+        static lbcrypto::Ciphertext<lbcrypto::DCRTPoly> abs(
+                const lbcrypto::CryptoContext<lbcrypto::DCRTPoly> &cryptoContext,
+                const lbcrypto::Ciphertext<lbcrypto::DCRTPoly> &encryptedX,
                 uint16_t iterationsCount);
 
 
@@ -41,10 +65,10 @@ namespace fhe_ext {
          * @param precision
          * @return the encrypted result of inverse(encryptedX)
          */
-        static lbcrypto::Ciphertext<lbcrypto::DCRTPoly> fheInverse(
-                const lbcrypto::CryptoContext<lbcrypto::DCRTPoly>& cryptoContext,
-                const lbcrypto::Ciphertext<lbcrypto::DCRTPoly>& encryptedX,
-                const lbcrypto::Ciphertext<lbcrypto::DCRTPoly>& ceAfterBootst,
+        static lbcrypto::Ciphertext<lbcrypto::DCRTPoly> inverse(
+                const lbcrypto::CryptoContext<lbcrypto::DCRTPoly> &cryptoContext,
+                const lbcrypto::Ciphertext<lbcrypto::DCRTPoly> &encryptedX,
+                const lbcrypto::Ciphertext<lbcrypto::DCRTPoly> &ceAfterBootst,
                 uint16_t iterationsCount);
 
         /**
@@ -60,10 +84,10 @@ namespace fhe_ext {
          * @param precision
          * @return the element wise max of a and b
          */
-        static lbcrypto::Ciphertext<lbcrypto::DCRTPoly> fheMaxPrime(
-                const lbcrypto::CryptoContext<lbcrypto::DCRTPoly>& cryptoContext,
-                const lbcrypto::Ciphertext<lbcrypto::DCRTPoly>& a,
-                const lbcrypto::Ciphertext<lbcrypto::DCRTPoly>& b);
+        static lbcrypto::Ciphertext<lbcrypto::DCRTPoly> maxPrime(
+                const lbcrypto::CryptoContext<lbcrypto::DCRTPoly> &cryptoContext,
+                const lbcrypto::Ciphertext<lbcrypto::DCRTPoly> &a,
+                const lbcrypto::Ciphertext<lbcrypto::DCRTPoly> &b);
 
         /**
          * Performs an element-wise computation of the max between a and b
@@ -78,11 +102,11 @@ namespace fhe_ext {
          * @param precision
          * @return the element wise max of a and b
          */
-        static lbcrypto::Ciphertext<lbcrypto::DCRTPoly> fheMax(
-                const lbcrypto::CryptoContext<lbcrypto::DCRTPoly>& cryptoContext,
-                const lbcrypto::Ciphertext<lbcrypto::DCRTPoly>& a,
-                const lbcrypto::Ciphertext<lbcrypto::DCRTPoly>& b,
-                const lbcrypto::Ciphertext<lbcrypto::DCRTPoly>& ceAfterBootstrap,
+        static lbcrypto::Ciphertext<lbcrypto::DCRTPoly> max(
+                const lbcrypto::CryptoContext<lbcrypto::DCRTPoly> &cryptoContext,
+                const lbcrypto::Ciphertext<lbcrypto::DCRTPoly> &a,
+                const lbcrypto::Ciphertext<lbcrypto::DCRTPoly> &b,
+                const lbcrypto::Ciphertext<lbcrypto::DCRTPoly> &ceAfterBootstrap,
                 int iterationsCount = 12);
     };
 }
